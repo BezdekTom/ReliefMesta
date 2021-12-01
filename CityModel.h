@@ -24,30 +24,28 @@ private:
 
 		Overlaping intersects(const Building& anotherBuilding) const
 		{
-			if (beginning > anotherBuilding.end)//dont care
+			if (beginning > anotherBuilding.end)
 			{
 				return Overlaping::newBehindOld;
 			}
-			else if (end < anotherBuilding.beginning) //just insert
+			if (end < anotherBuilding.beginning)
 			{
 				return Overlaping::newInfrontOld;
 			}
-			else if (beginning >= anotherBuilding.beginning && end <= anotherBuilding.end)
+			if (beginning >= anotherBuilding.beginning && end <= anotherBuilding.end)
 			{
 				return Overlaping::newInsideOld;
 			}
-			else if (beginning < anotherBuilding.beginning && end > anotherBuilding.end)
+			if (beginning < anotherBuilding.beginning && end > anotherBuilding.end)
 			{
 				return Overlaping::oldInsideNew;
 			}
-			else if (beginning < anotherBuilding.beginning)
+			if (beginning < anotherBuilding.beginning)
 			{
 				return Overlaping::newInAndOnLeftOfOld;
 			}
-			else if (end > anotherBuilding.end)	//could be just else
-			{
-				return Overlaping::newInAndOnRightOfOld;
-			}
+			//if (end > anotherBuilding.end)
+			return Overlaping::newInAndOnRightOfOld;
 		}
 
 		bool operator < (const Building& b) const
