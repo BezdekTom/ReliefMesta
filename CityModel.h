@@ -91,7 +91,6 @@ private:
 	int printPanorama(const Node* node, int lastEnd);
 
 public:
-	CityModel();
 	~CityModel();
 
 	/**

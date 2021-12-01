@@ -26,7 +26,7 @@ int main()
 	CityModel cm;
 	cm.addBuilding(1, 5, 8);
 	cm.addBuilding(2, 6, 8);
-	cm.addBuilding(3, 7, 8);
+	//cm.addBuilding(3, 7, 8);
 	cm.addBuilding(6, 7, 8);
 	cm.addBuilding(6, 12, 8);
 	cm.addBuilding(15, 20, 8);

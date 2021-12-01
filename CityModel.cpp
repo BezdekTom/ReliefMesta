@@ -2,10 +2,6 @@
 #include <climits>
 #include "CityModel.h"
 
-CityModel::CityModel()
-{
-}
-
 CityModel::~CityModel()
 {
 	delete root;
