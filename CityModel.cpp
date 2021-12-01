@@ -8,7 +8,7 @@ CityModel::CityModel()
 
 CityModel::~CityModel()
 {
-	treeDelete(root);
+	delete root;
 }
 
 void CityModel::addBuilding(int beginning, int end, int height)
@@ -16,85 +16,30 @@ void CityModel::addBuilding(int beginning, int end, int height)
 	loadedBuildings.push_back(Building{ beginning, end, height });
 }
 
-std::vector<int> CityModel::getPanorama()
+void CityModel::createGetPanorama(std::vector<int>& panorama)
 {
-	std::list<Building> panoramaBuildings;
-	//createPanorama(panoramaBuildings);
-	std::vector<int> panorama;
+	createPanorama();
 
-	auto iterator = panoramaBuildings.begin();
-	int lastEnd = INT_MAX;
-
-	for (iterator; iterator != panoramaBuildings.end(); ++iterator)
-	{
-		if (lastEnd < iterator->beginning)
-		{
-			panorama.push_back(lastEnd);
-			panorama.push_back(0);
-		}
-		panorama.push_back(iterator->beginning);
-		panorama.push_back(iterator->height);
-		lastEnd = iterator->end;
-	}
+	int lastEnd = getPanorama(root, INT_MAX,panorama);
 	if (lastEnd < INT_MAX)
 	{
 		panorama.push_back(lastEnd);
 		panorama.push_back(0);
 	}
-	return panorama;
 }
 
-void CityModel::printPanorama()
-{
-	std::list<Building> panoramaBuildings;
-	//createPanorama(panoramaBuildings);
-
-	std::cout << "(";
-
-	auto iterator = panoramaBuildings.begin();
-	int lastEnd = INT_MAX;
-
-	for (iterator; iterator != panoramaBuildings.end(); ++iterator)
-	{
-		if (lastEnd < iterator->beginning)
-		{
-			std::cout << lastEnd;
-			std::cout << ", 0, ";
-		}
-		std::cout<< iterator->beginning << ", ";
-		std::cout<< iterator->height << ", ";
-		lastEnd = iterator->end;
-	}
-	if (lastEnd < INT_MAX)
-	{
-		std::cout << lastEnd;
-		std::cout << ", 0";
-	}
-	std::cout << ")" << std::endl;
-}
-
-void CityModel::printTreePanorama()
+void CityModel::createPrintPanorama()
 {
 	createPanorama();
 	std::cout << "(";
 
 
-	int lastEnd = printTreePanorama(root, INT_MAX);
+	int lastEnd = printPanorama(root, INT_MAX);
 	if (lastEnd < INT_MAX)
 	{
 		std::cout << lastEnd << ", 0";
 	}
 	std::cout <<")" << std::endl;
-}
-
-void CityModel::treeDelete(Node* node)
-{
-	if (node != nullptr)
-	{
-		treeDelete(node->leftSubTree);
-		treeDelete(node->rightSubTree);
-		delete node;
-	}
 }
 
 void CityModel::insertToTree(Node*& node, const Building& addingBuilding)
@@ -121,6 +66,7 @@ void CityModel::insertToTree(Node*& node, const Building& addingBuilding)
 		case Overlaping::newInAndOnRightOfOld:
 			if (node->building.height == addingBuilding.height)
 			{
+				node->building.end = addingBuilding.end;
 				mergeWithRightSubtree(node);
 			}
 			else
@@ -147,7 +93,10 @@ void CityModel::mergeWithRightSubtree(Node*& node)
 		{
 			if (node->rightSubTree->building.beginning <= node->building.end)
 			{
-				node->building.end = node->rightSubTree->building.beginning;
+				if (node->building.end < node->rightSubTree->building.end)
+				{
+					node->building.end = node->rightSubTree->building.end;
+				}
 				Node* rst = node->rightSubTree;
 				node->rightSubTree = rst->rightSubTree;
 				delete rst;
@@ -189,6 +138,9 @@ bool CityModel::buildingComparator(const Building& b1, const Building& b2)
 
 void CityModel::createPanorama()
 {
+	delete root;
+	root = nullptr;
+
 	std::sort(loadedBuildings.begin(), loadedBuildings.end());
 	for (Building& addingBuilding : loadedBuildings)
 	{
@@ -196,17 +148,34 @@ void CityModel::createPanorama()
 	}
 }
 
-int CityModel::printTreePanorama(const Node* node, int lastEnd)
+int CityModel::getPanorama(const Node* node, int lastEnd, std::vector<int>& panorama)
 {
 	if (node != nullptr)
 	{
-		int le = printTreePanorama(node->leftSubTree, lastEnd);
+		int le = getPanorama(node->leftSubTree, lastEnd, panorama);
+		if (le < node->building.beginning)
+		{
+			panorama.push_back(le);
+			panorama.push_back(0);
+		}
+		panorama.push_back(node->building.beginning);
+		panorama.push_back(node->building.height);
+		return(getPanorama(node->rightSubTree, node->building.end, panorama));
+	}
+	return lastEnd;
+}
+
+int CityModel::printPanorama(const Node* node, int lastEnd)
+{
+	if (node != nullptr)
+	{
+		int le = printPanorama(node->leftSubTree, lastEnd);
 		if (le < node->building.beginning)
 		{
 			std::cout << le << ", 0, ";
 		}
 		std::cout << node->building.beginning<< ", " << node->building.height << ", ";
-		return(printTreePanorama(node->rightSubTree, node->building.end));
+		return(printPanorama(node->rightSubTree, node->building.end));
 	}
 	return lastEnd;
 }

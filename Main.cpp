@@ -11,7 +11,10 @@ void loadData(CityModel& cm, const std::string& fileName)
 
 	while (file >> begining >> height>> end)
 	{
-		cm.addBuilding(begining, end, height);
+		if(begining < end)
+		{
+			cm.addBuilding(begining, end, height);
+		}
 	}
 	file.close();
 }
@@ -20,10 +23,25 @@ int main()
 {
 	
 	CityModel cm;
-	//cm.addBuilding(1, 5, 6);
-	//cm.addBuilding(2, 4, 8);
-	loadData(cm, "testData.txt");
-	cm.printTreePanorama();
+	cm.addBuilding(1, 5, 8);
+	cm.addBuilding(2, 6, 8);
+	cm.addBuilding(3, 7, 8);
+	cm.addBuilding(6, 7, 8);
+	cm.addBuilding(6, 12, 8);
+	cm.addBuilding(15, 20, 8);
+	//cm.addBuilding(0, 9, 8);
+	//loadData(cm, "testData.txt");
+	std::vector<int> panorama;
+	cm.createGetPanorama(panorama);
+	std::cout << "(";
+	for(int n : panorama)
+	{
+		std::cout << n << " ";
+	}
+	std::cout << ")" << std::endl;
+
+	cm.createPrintPanorama();
+
 
 	return 0;
 }
