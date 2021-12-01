@@ -13,14 +13,12 @@ CityModel::~CityModel()
 
 void CityModel::addBuilding(int beginning, int end, int height)
 {
-	loadedBuildings.push_back(Building{ beginning, end, height });
+	heapBuilding.push(Building{ beginning,end,height });
 }
 
-void CityModel::createGetPanorama(std::vector<int>& panorama)
+void CityModel::getPanorama(std::vector<int>& panorama)
 {
-	createPanorama();
-
-	int lastEnd = getPanorama(root, INT_MAX,panorama);
+	int lastEnd = getPanorama(root, INT_MAX, panorama);
 	if (lastEnd < INT_MAX)
 	{
 		panorama.push_back(lastEnd);
@@ -28,25 +26,23 @@ void CityModel::createGetPanorama(std::vector<int>& panorama)
 	}
 }
 
-void CityModel::createPrintPanorama()
+void CityModel::printPanorama()
 {
-	createPanorama();
 	std::cout << "(";
-
 
 	int lastEnd = printPanorama(root, INT_MAX);
 	if (lastEnd < INT_MAX)
 	{
 		std::cout << lastEnd << ", 0";
 	}
-	std::cout <<")" << std::endl;
+	std::cout << ")" << std::endl;
 }
 
 void CityModel::insertToTree(Node*& node, const Building& addingBuilding)
 {
 	if (node == nullptr)
 	{
-		node = new Node(Building{ addingBuilding.beginning, addingBuilding.end, addingBuilding.height});
+		node = new Node(Building{ addingBuilding.beginning, addingBuilding.end, addingBuilding.height });
 	}
 	else
 	{
@@ -61,7 +57,7 @@ void CityModel::insertToTree(Node*& node, const Building& addingBuilding)
 		case Overlaping::newInsideOld:
 			break;
 		case Overlaping::newInAndOnLeftOfOld:
-			insertToTree(node->leftSubTree, Building{addingBuilding.beginning, node->building.beginning, addingBuilding.height});
+			insertToTree(node->leftSubTree, Building{ addingBuilding.beginning, node->building.beginning, addingBuilding.height });
 			break;
 		case Overlaping::newInAndOnRightOfOld:
 			if (node->building.height == addingBuilding.height)
@@ -115,25 +111,25 @@ void CityModel::mergeWithRightSubtree(Node*& node)
 
 bool CityModel::buildingComparator(const Building& b1, const Building& b2)
 {
-	if(b1.height > b2.height)
+	if (b1.height > b2.height)
 	{
-		return true;
+		return false;
 	}
 	else if (b1.height == b2.height)
 	{
 		if (b1.beginning < b2.beginning)
 		{
-			return true;
+			return false;
 		}
 		else if (b1.beginning == b2.beginning)
 		{
 			if ((b1.end - b1.beginning) >= (b2.end - b2.beginning))
 			{
-				return true;
+				return false;
 			}
 		}
 	}
-	return false;
+	return true;
 }
 
 void CityModel::createPanorama()
@@ -141,10 +137,11 @@ void CityModel::createPanorama()
 	delete root;
 	root = nullptr;
 
-	std::sort(loadedBuildings.begin(), loadedBuildings.end());
-	for (Building& addingBuilding : loadedBuildings)
+	while (!heapBuilding.empty())
 	{
+		const Building& addingBuilding = heapBuilding.top();
 		insertToTree(root, addingBuilding);
+		heapBuilding.pop();
 	}
 }
 
@@ -174,7 +171,7 @@ int CityModel::printPanorama(const Node* node, int lastEnd)
 		{
 			std::cout << le << ", 0, ";
 		}
-		std::cout << node->building.beginning<< ", " << node->building.height << ", ";
+		std::cout << node->building.beginning << ", " << node->building.height << ", ";
 		return(printPanorama(node->rightSubTree, node->building.end));
 	}
 	return lastEnd;

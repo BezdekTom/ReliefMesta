@@ -1,6 +1,7 @@
 #pragma once
 #include <list>
 #include <vector>
+#include <queue>
 #include <iostream>
 
 class CityModel
@@ -10,18 +11,20 @@ private:
 	 * .Posibilities, how could new building overlap already add one.
 	 */
 	enum class Overlaping
-	{newInfrontOld, newBehindOld, newInsideOld, oldInsideNew, newInAndOnRightOfOld, newInAndOnLeftOfOld};
-	
+	{
+		newInfrontOld, newBehindOld, newInsideOld, oldInsideNew, newInAndOnRightOfOld, newInAndOnLeftOfOld
+	};
+
 
 	struct Building
 	{
 		int beginning;
 		int end;
 		int height;
-		
+
 		Overlaping intersects(const Building& anotherBuilding) const
 		{
-			if(beginning > anotherBuilding.end)//dont care
+			if (beginning > anotherBuilding.end)//dont care
 			{
 				return Overlaping::newBehindOld;
 			}
@@ -29,7 +32,7 @@ private:
 			{
 				return Overlaping::newInfrontOld;
 			}
-			else if (beginning >= anotherBuilding.beginning && end<= anotherBuilding.end)
+			else if (beginning >= anotherBuilding.beginning && end <= anotherBuilding.end)
 			{
 				return Overlaping::newInsideOld;
 			}
@@ -41,7 +44,7 @@ private:
 			{
 				return Overlaping::newInAndOnLeftOfOld;
 			}
-			else if(end > anotherBuilding.end)	//could be just else
+			else if (end > anotherBuilding.end)	//could be just else
 			{
 				return Overlaping::newInAndOnRightOfOld;
 			}
@@ -78,44 +81,44 @@ private:
 	};
 
 	Node* root = nullptr;
-	std::vector<Building> loadedBuildings;
+	std::priority_queue<Building> heapBuilding;
 
-	void insertToTree(Node*& node,const Building& building);
+	void insertToTree(Node*& node, const Building& building);
 
 	void mergeWithRightSubtree(Node*& node);
 
 	static bool buildingComparator(const Building& b1, const Building& b2);
 
-	void createPanorama();
-
 	int getPanorama(const Node* node, int lastEnd, std::vector<int>& panorama);
 	int printPanorama(const Node* node, int lastEnd);
-	
+
 public:
 	CityModel();
 	~CityModel();
-	
+
 	/**
 	 * .Add new building to the vector of Buildings, from which panorama is created
-	 * 
+	 *
 	 * \param beginning is cordinate of beginning of the building.
 	 * \param end is cordinate of beginning of the building.
-	 * \param height 
+	 * \param height
 	 */
 	void addBuilding(int beginning, int end, int height);
 
+	void createPanorama();
+
 	/**
 	 * .Create new panorama and write it in the panorama, in format beginning of interval, height of interval, beginning of next interval, ...
-	 * 
+	 *
 	 * \param panorama vector which will be filled with panorama, should be empty, oitherwise will be erased adn then filled with panorama
 	 */
-	void createGetPanorama(std::vector<int>& panorama);
+	void getPanorama(std::vector<int>& panorama);
 
 	/**
 	 * .Create new panorama and print it to the console, in format beginning of interval, height of interval, beginning of next interval, ...
-	 * 
+	 *
 	 */
-	void createPrintPanorama();
+	void printPanorama();
 
 
 };
