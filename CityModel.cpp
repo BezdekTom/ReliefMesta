@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <climits>
 #include "CityModel.h"
 
 CityModel::CityModel()
@@ -6,215 +8,173 @@ CityModel::CityModel()
 
 CityModel::~CityModel()
 {
+	delete root;
 }
 
 void CityModel::addBuilding(int beginning, int end, int height)
 {
-	Building addingBuilding = Building{ beginning,end,height };
-	auto buildingIterator = buildings.begin();
+	heapBuilding.push(Building{ beginning,end,height });
+}
 
-	for (buildingIterator; buildingIterator != buildings.end(); ++buildingIterator)
+void CityModel::getPanorama(std::vector<int>& panorama)
+{
+	int lastEnd = getPanorama(root, INT_MAX, panorama);
+	if (lastEnd < INT_MAX)
 	{
-		switch (addingBuilding.intersects(*buildingIterator))
+		panorama.push_back(lastEnd);
+		panorama.push_back(0);
+	}
+}
+
+void CityModel::printPanorama()
+{
+	std::cout << "(";
+
+	int lastEnd = printPanorama(root, INT_MAX);
+	if (lastEnd < INT_MAX)
+	{
+		std::cout << lastEnd << ", 0";
+	}
+	std::cout << ")" << std::endl;
+}
+
+void CityModel::insertToTree(Node*& node, const Building& addingBuilding)
+{
+	if (node == nullptr)
+	{
+		node = new Node(Building{ addingBuilding.beginning, addingBuilding.end, addingBuilding.height });
+	}
+	else
+	{
+		switch (addingBuilding.intersects(node->building))
 		{
-		case -1:
-			buildings.insert(buildingIterator, addingBuilding);
-			return;
-		case 0:
+		case Overlaping::newBehindOld:
+			insertToTree(node->rightSubTree, addingBuilding);
 			break;
-		case 1:	//add.b , aB.b , add.e, aB.e
-			case1(addingBuilding, buildingIterator);
-			return;
-		case 2:	//add.b, aB.b, add.e=aB.e
-			case2(addingBuilding, buildingIterator);
-			return;
-		case 3:	//add.b, aB.b , aB.e , add.e
-			if (!case3(addingBuilding, buildingIterator))
-				return;
+		case Overlaping::newInfrontOld:
+			insertToTree(node->leftSubTree, addingBuilding);
 			break;
-		case 4:	//add.b=aB.b , add.e, aB.e
-			case4(addingBuilding, buildingIterator);
-			return;
-		case 5:	//add.b=aB.b, add.e=aB.e
-			case5(addingBuilding, buildingIterator);
-			return;
-		case 6:	//add.b=aB.b , aB.e , add.e
-			case6(addingBuilding, buildingIterator);
+		case Overlaping::newInsideOld:
 			break;
-		case 7:	//aB.b, add.b, add.e, aB.e
-			case7(addingBuilding, buildingIterator);
-			return;
-		case 8:	//aB.b, add.b, add.e=aB.e
-			case8(addingBuilding, buildingIterator);
-			return;
-		case 9:	//aB.b, add.b, aB.e , add.e
-			case9(addingBuilding, buildingIterator);
+		case Overlaping::newInAndOnLeftOfOld:
+			insertToTree(node->leftSubTree, Building{ addingBuilding.beginning, node->building.beginning, addingBuilding.height });
+			break;
+		case Overlaping::newInAndOnRightOfOld:
+			if (node->building.height == addingBuilding.height)
+			{
+				node->building.end = addingBuilding.end;
+				mergeWithRightSubtree(node);
+			}
+			else
+			{
+				insertToTree(node->rightSubTree, Building{ node->building.end,addingBuilding.end, addingBuilding.height });
+			}
+			break;
+		case Overlaping::oldInsideNew:
+			insertToTree(node->leftSubTree, Building{ addingBuilding.beginning, node->building.beginning, addingBuilding.height });
+			insertToTree(node->rightSubTree, Building{ node->building.end,addingBuilding.end, addingBuilding.height });
 			break;
 		default:
 			break;
 		}
 	}
-
-	buildings.push_back(addingBuilding);
 }
 
-void CityModel::getPanorama()
+void CityModel::mergeWithRightSubtree(Node*& node)
 {
-	auto iterator = buildings.begin();
-	for (iterator; iterator != buildings.end(); ++iterator)
+	bool merging = true;
+	while (merging)
 	{
-		std::cout << iterator->beginning << std::endl;
-		std::cout << iterator->height << std::endl;
-	}
-	
-}
-
-
-void CityModel::case1(Building& addingBuilding, std::list<Building>::iterator& buildingIterator) //correct
-{
-	if (addingBuilding.height > buildingIterator->height)
-	{
-		buildingIterator->beginning = addingBuilding.end;
-		buildings.insert(buildingIterator, addingBuilding);
-	}
-	else if (addingBuilding.height == buildingIterator->height)
-	{
-		buildingIterator->beginning = addingBuilding.beginning;
-	}
-	else
-	{
-		addingBuilding.end = buildingIterator->beginning;
-		buildings.insert(buildingIterator, addingBuilding);
-	}
-}
-
-void CityModel::case2(Building& addingBuilding, std::list<Building>::iterator& buildingIterator)	//correct
-{
-	if (addingBuilding.height > buildingIterator->height)
-	{
-		buildingIterator->height = addingBuilding.height;
-		buildingIterator->beginning = addingBuilding.beginning;
-	}
-	else if (addingBuilding.height == buildingIterator->height)
-	{
-		buildingIterator->beginning = addingBuilding.beginning;
-	}
-	else
-	{
-		addingBuilding.end = buildingIterator->beginning;
-		buildings.insert(buildingIterator, addingBuilding);
-	}
-}
-
-bool CityModel::case3(Building& addingBuilding, std::list<Building>::iterator& buildingIterator)
-{
-	if (addingBuilding.height < buildingIterator->height)
-	{
-		buildings.insert(buildingIterator, Building{ addingBuilding.beginning, buildingIterator->beginning, addingBuilding.height });
-		addingBuilding.beginning = buildingIterator->end;
-	}
-	else if (addingBuilding.height >= buildingIterator->height)
-	{
-		auto next = buildingIterator;
-		next++;
-		if (next == buildings.end()--)
+		if (node->rightSubTree != nullptr)
 		{
-			buildingIterator->beginning = addingBuilding.beginning;
-			buildingIterator->end = addingBuilding.end;
-			buildingIterator->height = addingBuilding.height;
+			if (node->rightSubTree->building.beginning <= node->building.end)
+			{
+				if (node->building.end < node->rightSubTree->building.end)
+				{
+					node->building.end = node->rightSubTree->building.end;
+				}
+				Node* rst = node->rightSubTree;
+				node->rightSubTree = rst->rightSubTree;
+				delete rst;
+			}
+			else
+			{
+				merging = false;
+			}
+		}
+		else
+		{
+			merging = false;
+		}
+	}
+}
+
+bool CityModel::buildingComparator(const Building& b1, const Building& b2)
+{
+	if (b1.height > b2.height)
+	{
+		return false;
+	}
+	else if (b1.height == b2.height)
+	{
+		if (b1.beginning < b2.beginning)
+		{
 			return false;
 		}
-		buildingIterator = buildings.erase(buildingIterator);
-		return true;
-	}
-}
-
-void CityModel::case4(Building& addingBuilding, std::list<Building>::iterator& buildingIterator)	//correct
-{
-	if (addingBuilding.height > buildingIterator->height)
-	{
-		buildingIterator->beginning = addingBuilding.end;
-		buildings.insert(buildingIterator, addingBuilding);
-	}
-}
-
-void CityModel::case5(Building& addingBuilding, std::list<Building>::iterator& buildingIterator)	//correct
-{
-	if (addingBuilding.height > buildingIterator->height)
-	{
-		buildingIterator->height = addingBuilding.height;
-	}
-}
-
-bool CityModel::case6(Building& addingBuilding, std::list<Building>::iterator& buildingIterator)
-{
-	if (addingBuilding.height < buildingIterator->height)
-	{
-		addingBuilding.beginning = buildingIterator->end;
-		return true;
-	}
-	else if (addingBuilding.height >= buildingIterator->height)
-	{
-		auto next = buildingIterator;
-		next++;
-		if (next == buildings.end()--)
+		else if (b1.beginning == b2.beginning)
 		{
-			buildingIterator->beginning = addingBuilding.beginning;
-			buildingIterator->end = addingBuilding.end;
-			buildingIterator->height = addingBuilding.height;
-			return false;
+			if ((b1.end - b1.beginning) >= (b2.end - b2.beginning))
+			{
+				return false;
+			}
 		}
-		
-		buildingIterator = buildings.erase(buildingIterator);
-		return true;
+	}
+	return true;
+}
+
+void CityModel::createPanorama()
+{
+	delete root;
+	root = nullptr;
+
+	while (!heapBuilding.empty())
+	{
+		const Building& addingBuilding = heapBuilding.top();
+		insertToTree(root, addingBuilding);
+		heapBuilding.pop();
 	}
 }
 
-void CityModel::case7(Building& addingBuilding, std::list<Building>::iterator& buildingIterator)	//correct
+int CityModel::getPanorama(const Node* node, int lastEnd, std::vector<int>& panorama)
 {
-	if (addingBuilding.height > buildingIterator->height)
+	if (node != nullptr)
 	{
-		buildings.insert(buildingIterator, Building{ buildingIterator->beginning, addingBuilding.beginning,buildingIterator->height });
-		buildingIterator->beginning = addingBuilding.end;
-		buildings.insert(buildingIterator, addingBuilding);
-	}
-}
-
-void CityModel::case8(Building& addingBuilding, std::list<Building>::iterator& buildingIterator)	//correct
-{
-	if (addingBuilding.height > buildingIterator->height)
-	{
-		buildings.insert(buildingIterator, Building{ buildingIterator->beginning, addingBuilding.beginning,buildingIterator->height });
-		buildingIterator->end = addingBuilding.beginning;
-		buildingIterator->height = addingBuilding.height;
-	}
-}
-
-bool CityModel::case9(Building& addingBuilding, std::list<Building>::iterator& buildingIterator)
-{
-	if (addingBuilding.height < buildingIterator->height)
-	{
-		addingBuilding.beginning = buildingIterator->end;
-		return true;
-	}
-	else if (addingBuilding.height == buildingIterator->height)
-	{
-		addingBuilding.beginning = buildingIterator->beginning;
-		auto next = buildingIterator;
-		next++;
-		if (next == buildings.end()--)
+		int le = getPanorama(node->leftSubTree, lastEnd, panorama);
+		if (le < node->building.beginning)
 		{
-			buildingIterator->beginning = addingBuilding.beginning;
-			buildingIterator->end = addingBuilding.end;
-			buildingIterator->height = addingBuilding.height;
-			return false;
+			panorama.push_back(le);
+			panorama.push_back(0);
 		}
-		buildingIterator = buildings.erase(buildingIterator);
-		return true;
+		panorama.push_back(node->building.beginning);
+		panorama.push_back(node->building.height);
+		return(getPanorama(node->rightSubTree, node->building.end, panorama));
 	}
-	else
-	{
-		buildingIterator->end = addingBuilding.beginning;
-		return true;
-	}
+	return lastEnd;
 }
+
+int CityModel::printPanorama(const Node* node, int lastEnd)
+{
+	if (node != nullptr)
+	{
+		int le = printPanorama(node->leftSubTree, lastEnd);
+		if (le < node->building.beginning)
+		{
+			std::cout << le << ", 0, ";
+		}
+		std::cout << node->building.beginning << ", " << node->building.height << ", ";
+		return(printPanorama(node->rightSubTree, node->building.end));
+	}
+	return lastEnd;
+}
+
+

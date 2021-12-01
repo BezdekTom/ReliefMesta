@@ -1,92 +1,124 @@
 #pragma once
 #include <list>
 #include <vector>
+#include <queue>
 #include <iostream>
 
 class CityModel
 {
 private:
+	/**
+	 * .Posibilities, how could new building overlap already add one.
+	 */
+	enum class Overlaping
+	{
+		newInfrontOld, newBehindOld, newInsideOld, oldInsideNew, newInAndOnRightOfOld, newInAndOnLeftOfOld
+	};
+
+
 	struct Building
 	{
 		int beginning;
 		int end;
 		int height;
-		
-		int intersects(const Building& anotherBuilding)
+
+		Overlaping intersects(const Building& anotherBuilding) const
 		{
-			if(beginning >= anotherBuilding.end)//anotherBuildung koncipred touto budovou
+			if (beginning > anotherBuilding.end)//dont care
 			{
-				return 0;
+				return Overlaping::newBehindOld;
 			}
-			else if (end <= anotherBuilding.beginning) //anotherBuilding lezi az za touto budovou
+			else if (end < anotherBuilding.beginning) //just insert
 			{
-				return -1;
+				return Overlaping::newInfrontOld;
 			}
-			else if (beginning < anotherBuilding.beginning)	//anotherBuiding zacina vic v pravo nez tato building
+			else if (beginning >= anotherBuilding.beginning && end <= anotherBuilding.end)
 			{
-				if (end < anotherBuilding.end)	//b , aB.b , e, aB.e
-				{
-					return 1;
-				}
-				else if (end == anotherBuilding.end)	//b, aB.b, e=aB.e
-				{
-					return 2;
-				}
-				else	//b, aB.b , aB.e , e
-				{
-					return 3;
-				}
+				return Overlaping::newInsideOld;
 			}
-			else if (beginning == anotherBuilding.beginning)	//anotherBuiding zacina stejne jako tato building
+			else if (beginning < anotherBuilding.beginning && end > anotherBuilding.end)
 			{
-				if (end < anotherBuilding.end)	//b=aB.b , e, aB.e
-				{
-					return 4;
-				}
-				else if (end == anotherBuilding.end)	//b=aB.b, e=aB.e
-				{
-					return 5;
-				}
-				else	//b=aB.b , aB.e , e
-				{
-					return 6;
-				}
+				return Overlaping::oldInsideNew;
 			}
-			else	//anotherBuiding zacina vic v levo nez tato building
+			else if (beginning < anotherBuilding.beginning)
 			{
-				if (end < anotherBuilding.end)	//aB.b, b, e, aB.e
-				{
-					return 7;
-				}
-				else if (end == anotherBuilding.end)	//aB.b, b, e=aB.e
-				{
-					return 8;
-				}
-				else	//aB.b, b, aB.e , e
-				{
-					return 9;
-				}
+				return Overlaping::newInAndOnLeftOfOld;
 			}
+			else if (end > anotherBuilding.end)	//could be just else
+			{
+				return Overlaping::newInAndOnRightOfOld;
+			}
+		}
+
+		bool operator < (const Building& b) const
+		{
+			return buildingComparator(*this, b);
 		}
 	};
 
-	std::list<Building> buildings;
+	class Node
+	{
+	public:
+		Building building;
+		Node* leftSubTree = nullptr;
+		Node* rightSubTree = nullptr;
 
-	void case1(Building& addingBuilding, std::list<Building>::iterator& buildingIterator);
-	void case2(Building& addingBuilding, std::list<Building>::iterator& buildingIterator);
-	bool case3(Building& addingBuilding, std::list<Building>::iterator& buildingIterator);
-	void case4(Building& addingBuilding, std::list<Building>::iterator& buildingIterator);
-	void case5(Building& addingBuilding, std::list<Building>::iterator& buildingIterator);
-	bool case6(Building& addingBuilding, std::list<Building>::iterator& buildingIterator);
-	void case7(Building& addingBuilding, std::list<Building>::iterator& buildingIterator);
-	void case8(Building& addingBuilding, std::list<Building>::iterator& buildingIterator);
-	bool case9(Building& addingBuilding, std::list<Building>::iterator& buildingIterator);
+		Node(Building _building) { building = _building; };
+		~Node()
+		{
+			if (rightSubTree)
+			{
+				delete rightSubTree;
+				rightSubTree = nullptr;
+			}
+
+			if (leftSubTree)
+			{
+				delete leftSubTree;
+				leftSubTree = nullptr;
+			}
+		};
+	};
+
+	Node* root = nullptr;
+	std::priority_queue<Building> heapBuilding;
+
+	void insertToTree(Node*& node, const Building& building);
+
+	void mergeWithRightSubtree(Node*& node);
+
+	static bool buildingComparator(const Building& b1, const Building& b2);
+
+	int getPanorama(const Node* node, int lastEnd, std::vector<int>& panorama);
+	int printPanorama(const Node* node, int lastEnd);
 
 public:
 	CityModel();
 	~CityModel();
+
+	/**
+	 * .Add new building to the vector of Buildings, from which panorama is created
+	 *
+	 * \param beginning is cordinate of beginning of the building.
+	 * \param end is cordinate of beginning of the building.
+	 * \param height
+	 */
 	void addBuilding(int beginning, int end, int height);
-	void getPanorama();
+
+	void createPanorama();
+
+	/**
+	 * .Create new panorama and write it in the panorama, in format beginning of interval, height of interval, beginning of next interval, ...
+	 *
+	 * \param panorama vector which will be filled with panorama, should be empty, oitherwise will be erased adn then filled with panorama
+	 */
+	void getPanorama(std::vector<int>& panorama);
+
+	/**
+	 * .Create new panorama and print it to the console, in format beginning of interval, height of interval, beginning of next interval, ...
+	 *
+	 */
+	void printPanorama();
 
 
 };
