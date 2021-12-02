@@ -139,11 +139,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CityModel.h" />
+    <ClInclude Include="BuildingsLoader.h" />
+    <ClInclude Include="ReliefCreater.h" />
+    <ClInclude Include="ReliefPrinter.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CityModel.cpp" />
+    <ClCompile Include="BuildingsLoader.cpp" />
+    <ClCompile Include="ReliefCreater.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="ReliefPrinter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="testData.txt" />
