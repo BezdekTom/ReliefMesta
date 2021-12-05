@@ -140,12 +140,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BuildingsLoader.h" />
-    <ClInclude Include="ReliefCreater.h" />
+    <ClInclude Include="ReliefCreator.h" />
     <ClInclude Include="ReliefPrinter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BuildingsLoader.cpp" />
-    <ClCompile Include="ReliefCreater.cpp" />
+    <ClCompile Include="ReliefCreator.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ReliefPrinter.cpp" />
   </ItemGroup>

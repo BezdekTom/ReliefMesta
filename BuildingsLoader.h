@@ -1,6 +1,6 @@
 #pragma once
 #include <fstream>
-#include "ReliefCreater.h"
+#include "ReliefCreator.h"
 
 class BuildingsLoader
 {
@@ -12,6 +12,6 @@ public:
 	 * \param inputFileName name of file with data about building, in form:  <int begin> <int height> <int end> \n 
 	 * \return false if its imposible to add the building to reliefCreater, otherwise it return true
 	 */
-	static bool loadBuildingsFromFile(ReliefCreater& reliefCreater, const std::string& inputFileName);
+	static bool loadBuildingsFromFile(ReliefCreator& reliefCreater, const std::string& inputFileName);
 };
 

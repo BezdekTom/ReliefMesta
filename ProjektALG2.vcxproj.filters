@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ReliefCreater.h">
+    <ClInclude Include="ReliefCreator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReliefPrinter.h">
@@ -26,7 +26,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ReliefCreater.cpp">
+    <ClCompile Include="ReliefCreator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">

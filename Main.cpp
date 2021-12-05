@@ -2,11 +2,11 @@
 #include <string>
 #include <iostream>
 
-#include "ReliefCreater.h"
+#include "ReliefCreator.h"
 #include "ReliefPrinter.h"
 #include "BuildingsLoader.h"
 
-void manualTests(ReliefCreater& reliefCreater)
+void manualTests(ReliefCreator& reliefCreater)
 {
 	reliefCreater.addBuilding(1, 5, 8);
 	reliefCreater.addBuilding(2, 6, 8);
@@ -21,7 +21,7 @@ void manualTests(ReliefCreater& reliefCreater)
 int main()
 {
 
-	ReliefCreater reliefCreater;
+	ReliefCreator reliefCreater;
 	
 	//manualTests(reliefCreater);
 	

@@ -1,16 +1,17 @@
 #include "BuildingsLoader.h"
 
-bool BuildingsLoader::loadBuildingsFromFile(ReliefCreater& reliefCreater, const std::string& inputFileName)
+bool BuildingsLoader::loadBuildingsFromFile(ReliefCreator& reliefCreater, const std::string& inputFileName)
 {
 	try
 	{
-		std::ifstream file;
-		file.open(inputFileName);
-		int begin, end, height = 0;
+		std::ifstream file(inputFileName);
+		int begin = 0;
+		int end = 0;
+		int height = 0;
 
 		while (file >> begin >> height >> end)
 		{
-			if (begin < end)
+			if ((begin < end) && (height > 0))
 			{
 				if (reliefCreater.addBuilding(begin, height, end) == false)
 				{
@@ -24,7 +25,7 @@ bool BuildingsLoader::loadBuildingsFromFile(ReliefCreater& reliefCreater, const 
 	}
 	catch (const std::exception& ex)
 	{
-		std::cout << "Problem with BuildingsLoader, because: "<< ex.what() << "!\n";
+		std::cerr << "Problem with BuildingsLoader, because: "<< ex.what() << "!\n";
 		return false;
 	}
 }

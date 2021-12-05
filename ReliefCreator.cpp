@@ -1,21 +1,21 @@
 #include <algorithm>
 #include <climits>
-#include "ReliefCreater.h"
+#include "ReliefCreator.h"
 
-bool ReliefCreater::addBuilding(int begin, int height, int end)
+bool ReliefCreator::addBuilding(int begin, int height, int end)
 {
-	if (editable == true)
+	if (editable)
 	{
 		heapBuilding.push(Building{ begin,end,height });
 	}
 	return editable;
 }
 
-void ReliefCreater::insertToTree(Node*& node, const Building& addingBuilding)
+void ReliefCreator::insertToTree(Node*& node, const Building& addingBuilding)
 {
 	if (node == nullptr)
 	{
-		node = new Node(Building{ addingBuilding.begin, addingBuilding.end, addingBuilding.height });
+		node = new Node(addingBuilding);
 	}
 	else
 	{
@@ -53,10 +53,9 @@ void ReliefCreater::insertToTree(Node*& node, const Building& addingBuilding)
 	}
 }
 
-void ReliefCreater::mergeWithRightSubtree(Node*& node)
+void ReliefCreator::mergeWithRightSubtree(Node*& node)
 {
-	bool merging = true;
-	while (merging)
+	while (true)
 	{
 		if (node->rightSubTree != nullptr)
 		{
@@ -68,49 +67,51 @@ void ReliefCreater::mergeWithRightSubtree(Node*& node)
 				}
 				Node* rst = node->rightSubTree;
 				node->rightSubTree = rst->rightSubTree;
+				rst->rightSubTree = nullptr;
 				delete rst;
 			}
 			else
 			{
-				merging = false;
+				return;
 			}
 		}
 		else
 		{
-			merging = false;
+			return;
 		}
 	}
 }
 
-bool ReliefCreater::createRelief()
+bool ReliefCreator::createRelief()
 {
-	if (editable == true)
+	if (!editable)
 	{
-		Node* root = nullptr;
-
-		while (!heapBuilding.empty())
-		{
-			const Building& addingBuilding = heapBuilding.top();
-			insertToTree(root, addingBuilding);
-			heapBuilding.pop();
-		}
-
-		treeToVector(root);
-		delete root;
-
-		editable = false;
-		return true;
+		return false;
 	}
-	return false;
+
+	Node* root = nullptr;
+
+	while (!heapBuilding.empty())
+	{
+		const Building& addingBuilding = heapBuilding.top();
+		insertToTree(root, addingBuilding);
+		heapBuilding.pop();
+	}
+
+	treeToVector(root);
+	delete root;
+
+	editable = false;
+	return true;
 }
 
-const std::vector<int>& ReliefCreater::getRelief() const
+const std::vector<int>& ReliefCreator::getRelief() const
 {
 	return relief;
 }
 
 
-ReliefCreater::Overlaping ReliefCreater::Building::intersects(const Building& anotherBuilding) const
+ReliefCreator::Overlaping ReliefCreator::Building::intersects(const Building& anotherBuilding) const
 {
 	if (begin > anotherBuilding.end)
 	{
@@ -136,7 +137,7 @@ ReliefCreater::Overlaping ReliefCreater::Building::intersects(const Building& an
 	return Overlaping::newInAndOnRightOfOld;
 }
 
-void ReliefCreater::treeToVector(Node* root)
+void ReliefCreator::treeToVector(Node* root)
 {
 	int lastEnd = treeToVector(root, INT_MAX);
 	if (lastEnd < INT_MAX)
@@ -146,40 +147,43 @@ void ReliefCreater::treeToVector(Node* root)
 	}
 }
 
-int ReliefCreater::treeToVector(Node* node, int lastEnd)
+int ReliefCreator::treeToVector(Node* node, int lastEnd)
 {
-	if (node != nullptr)
+	if (node == nullptr)
 	{
-		int le = treeToVector(node->leftSubTree, lastEnd);
-		if (le < node->building.begin)
-		{
-			relief.push_back(le);
-			relief.push_back(0);
-		}
-		relief.push_back(node->building.begin);
-		relief.push_back(node->building.height);
-		return(treeToVector(node->rightSubTree, node->building.end));
+		return lastEnd;
 	}
-	return lastEnd;
+
+	int le = treeToVector(node->leftSubTree, lastEnd);
+	if (le < node->building.begin)
+	{
+		relief.push_back(le);
+		relief.push_back(0);
+	}
+	relief.push_back(node->building.begin);
+	relief.push_back(node->building.height);
+	return(treeToVector(node->rightSubTree, node->building.end));
+
 }
 
 
 
 
 
-bool ReliefCreater::Building::operator<(const Building& b) const
+bool ReliefCreator::Building::operator<(const Building& b) const
 {
 	if (height > b.height)
 	{
 		return false;
 	}
-	else if (height == b.height)
+	
+	if (height == b.height)
 	{
 		if (begin < b.begin)
 		{
 			return false;
 		}
-		else if (begin == b.begin)
+		if (begin == b.begin)
 		{
 			if ((end - begin) >= (b.end - b.begin))
 			{
@@ -190,7 +194,7 @@ bool ReliefCreater::Building::operator<(const Building& b) const
 	return true;
 }
 
-ReliefCreater::Node::~Node()
+ReliefCreator::Node::~Node()
 {
 	if (rightSubTree != nullptr)
 	{

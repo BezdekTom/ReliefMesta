@@ -2,9 +2,9 @@
 
 bool ReliefPrinter::printRelief(const std::vector<int>& relief, std::ostream& outputStream)
 {
-    outputStream << "( ";
     if (relief.size() % 2 == 0)
     {
+        outputStream << "( ";
         for (size_t i = 0; i < relief.size()-1; i++)
         {
             outputStream << relief[i] << ", ";
@@ -17,5 +17,5 @@ bool ReliefPrinter::printRelief(const std::vector<int>& relief, std::ostream& ou
 
         return true;
     }
-    return false;
+    return false;/*wrong format of relief, odd number of elements, number of elements has to be even */
 }

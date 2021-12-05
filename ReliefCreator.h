@@ -4,7 +4,7 @@
 #include <queue>
 #include <iostream>
 
-class ReliefCreater
+class ReliefCreator
 {
 private:
 	/**
@@ -83,7 +83,7 @@ private:
 	};
 
 	/**
-	 * Varieble indikates wheather the relief was already created.
+	 * Variable indikates wheather the relief was already created.
 	 * If was, only method getRelief do something, other methods do nothing and returning false.
 	 */
 	bool editable = true;
@@ -129,9 +129,6 @@ private:
 	int treeToVector(Node* root, int lastEnd);
 
 public:
-	ReliefCreater() = default;
-	~ReliefCreater() = default;
-
 	/**
 	 * Add new building to the vector of Buildings, from which relief is created.
 	 *
