@@ -1,6 +1,6 @@
 #include "BuildingsLoader.h"
 
-bool BuildingsLoader::loadBuildingsFromFile(ReliefCreator& reliefCreater, const std::string& inputFileName)
+bool BuildingsLoader::loadBuildingsFromFile(ReliefCreator& reliefCreator, const std::string& inputFileName)
 {
 	try
 	{
@@ -13,7 +13,7 @@ bool BuildingsLoader::loadBuildingsFromFile(ReliefCreator& reliefCreater, const 
 		{
 			if ((begin < end) && (height > 0))
 			{
-				if (reliefCreater.addBuilding(begin, height, end) == false)
+				if (reliefCreator.addBuilding(begin, height, end) == false)
 				{
 					file.close();
 					return false;
@@ -25,7 +25,7 @@ bool BuildingsLoader::loadBuildingsFromFile(ReliefCreator& reliefCreater, const 
 	}
 	catch (const std::exception& ex)
 	{
-		std::cerr << "Problem with BuildingsLoader, because: "<< ex.what() << "!\n";
+		std::cerr << "Problem with BuildingsLoader, because: " << ex.what() << "!\n";
 		return false;
 	}
 }

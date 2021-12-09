@@ -6,12 +6,11 @@ class ReliefPrinter
 {
 public:
 	/**
-	 * Print relief in vector format into the given output stram
-	 * 
-	 * \param relief is the relief in the format given in assignement
+	 * Prints relief in vector format into the given output stream
+	 *
+	 * \param relief is the relief in the format given in assignment
 	 * \param outputStream
-	 * \return false if data in relief are not in right format (odd number of numbers), otherwise return true
+	 * \return false if data in relief are not in right format (odd number of numbers), otherwise returns true
 	 */
 	static bool printRelief(const std::vector<int>& relief, std::ostream& outputStream);
 };
-
