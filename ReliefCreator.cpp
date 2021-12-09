@@ -36,7 +36,6 @@ void ReliefCreator::insertToTree(Node*& node, const Building& addingBuilding)
 			if (node->building.height == addingBuilding.height)
 			{
 				node->building.end = addingBuilding.end;
-				mergeWithRightSubtree(node);
 			}
 			else
 			{
@@ -49,35 +48,6 @@ void ReliefCreator::insertToTree(Node*& node, const Building& addingBuilding)
 			break;
 		default:
 			break;
-		}
-	}
-}
-
-void ReliefCreator::mergeWithRightSubtree(Node*& node)
-{
-	while (true)
-	{
-		if (node->rightSubTree != nullptr)
-		{
-			if (node->rightSubTree->building.begin <= node->building.end)
-			{
-				if (node->building.end < node->rightSubTree->building.end)
-				{
-					node->building.end = node->rightSubTree->building.end;
-				}
-				Node* rst = node->rightSubTree;
-				node->rightSubTree = rst->rightSubTree;
-				rst->rightSubTree = nullptr;
-				delete rst;
-			}
-			else
-			{
-				return;
-			}
-		}
-		else
-		{
-			return;
 		}
 	}
 }

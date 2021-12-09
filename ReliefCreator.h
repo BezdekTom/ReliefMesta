@@ -106,13 +106,6 @@ private:
 	void insertToTree(Node*& node, const Building& building);
 
 	/**
-	 * If the new building overlap buildings in nodes with same height, this method merge them in one node.
-	 * 
-	 * \param node represents the new added building, which posibly overlaping buildings in another nodes with same height
-	 */
-	void mergeWithRightSubtree(Node*& node);
-
-	/**
 	 * Convert relief in tree format to relief in format that was given in the assignment
 	 * 
 	 * \param root is root of the tree, that represents relief

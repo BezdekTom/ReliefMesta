@@ -6,30 +6,25 @@
 #include "ReliefPrinter.h"
 #include "BuildingsLoader.h"
 
-void manualTests(ReliefCreator& reliefCreater)
+void manualTests(ReliefCreator& reliefCreator)
 {
-	reliefCreater.addBuilding(1, 5, 8);
-	reliefCreater.addBuilding(2, 6, 8);
-	reliefCreater.addBuilding(3, 7, 8);
-	reliefCreater.addBuilding(6, 7, 8);
-	reliefCreater.addBuilding(6, 12, 8);
-	reliefCreater.addBuilding(15, 20, 8);
-	reliefCreater.addBuilding(0, 9, 8);
+	reliefCreator.addBuilding(1, 8, 7);
+	reliefCreator.addBuilding(6, 8, 9);
 }
 
 
 int main()
 {
 
-	ReliefCreator reliefCreater;
-	
-	//manualTests(reliefCreater);
-	
-	BuildingsLoader::loadBuildingsFromFile(reliefCreater, "testData.txt");
+	ReliefCreator reliefCreator;
+
+	//manualTests(reliefCreator);
+
+	BuildingsLoader::loadBuildingsFromFile(reliefCreator, "testData.txt");
 
 
-	reliefCreater.createRelief();
-	const std::vector<int>& relief = reliefCreater.getRelief();
+	reliefCreator.createRelief();
+	const std::vector<int>& relief = reliefCreator.getRelief();
 
 	ReliefPrinter::printRelief(relief, std::cout);
 
