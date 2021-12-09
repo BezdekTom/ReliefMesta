@@ -1,49 +1,32 @@
 #include <fstream>
 #include <string>
+#include <iostream>
 
-#include "CityModel.h"
+#include "ReliefCreator.h"
+#include "ReliefPrinter.h"
+#include "BuildingsLoader.h"
 
-
-void loadData(CityModel& cm, const std::string& fileName)
+void manualTests(ReliefCreator& reliefCreator)
 {
-	std::fstream file;
-	file.open(fileName);
-	int begining, end, height = 0;
-
-	while (file >> begining >> height >> end)
-	{
-		if (begining < end)
-		{
-			cm.addBuilding(begining, end, height);
-		}
-	}
-	file.close();
+	reliefCreator.addBuilding(1, 8, 7);
+	reliefCreator.addBuilding(6, 8, 9);
 }
+
 
 int main()
 {
 
-	CityModel cm;
-	cm.addBuilding(1, 5, 8);
-	cm.addBuilding(2, 6, 8);
-	cm.addBuilding(3, 7, 8);
-	cm.addBuilding(6, 7, 8);
-	cm.addBuilding(6, 12, 8);
-	cm.addBuilding(15, 20, 8);
-	//cm.addBuilding(0, 9, 8);
-	//loadData(cm, "testData.txt");
-	std::vector<int> panorama;
-	cm.createPanorama();
-	cm.getPanorama(panorama);
-	std::cout << "(";
-	for (int n : panorama)
-	{
-		std::cout << n << " ";
-	}
-	std::cout << ")" << std::endl;
+	ReliefCreator reliefCreator;
 
-	cm.printPanorama();
+	//manualTests(reliefCreator);
 
+	BuildingsLoader::loadBuildingsFromFile(reliefCreator, "testData.txt");
+
+
+	reliefCreator.createRelief();
+	const std::vector<int>& relief = reliefCreator.getRelief();
+
+	ReliefPrinter::printRelief(relief, std::cout);
 
 	return 0;
 }
