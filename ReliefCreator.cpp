@@ -137,16 +137,13 @@ int ReliefCreator::treeToVector(Node* node, int lastEnd)
 }
 
 
-
-
-
 bool ReliefCreator::Building::operator<(const Building& b) const
 {
 	if (height > b.height)
 	{
 		return false;
 	}
-	
+
 	if (height == b.height)
 	{
 		if (begin < b.begin)

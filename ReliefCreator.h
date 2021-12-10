@@ -8,11 +8,11 @@ class ReliefCreator
 {
 private:
 	/**
-	 *Posibilities, how the new building could overlap already added one.
+	 *Possibilities, how the new building could overlap already added one.
 	 */
 	enum class Overlaping
 	{
-		newOnLeftOfOld, 
+		newOnLeftOfOld,
 		newOnRightOfOld,
 		newInsideOld,
 		oldInsideNew,
@@ -22,16 +22,16 @@ private:
 
 	/**
 	 * Struct representing a building in he city.
-	 * 
+	 *
 	 */
 	struct Building
 	{
 		/**
-		 * X cordinates of begin of the building
+		 * X coordinate of beginning of the building
 		 */
 		int begin;
 		/**
-		 * X cordinates of end of the building
+		 * X coordinate of end of the building
 		 */
 		int end;
 		/**
@@ -40,18 +40,18 @@ private:
 		int height;
 
 		/**
-		 * Methot, whitch inding out how anotherBuilding overlap this building
-		 * 
+		 * Finds out how anotherBuilding overlap this building
+		 *
 		 * \param anotherBuilding
-		 * \return one of the ovrlaping posibilities
+		 * \return one of the overlapping possibilities
 		 */
 		Overlaping intersects(const Building& anotherBuilding) const;
 
 		/**
-		 * Operator compare buildings due to height, heigher meen bigger. 
-		 * 
+		 * Operator compare buildings due to height, higher means bigger.
+		 *
 		 * \param b second building for comparing
-		 * \return 
+		 * \return
 		 */
 		bool operator < (const Building& b) const;
 	};
@@ -63,28 +63,28 @@ private:
 	{
 	public:
 		/**
-		 * Bulding in the node
+		 * Building in the node
 		 */
 		Building building;
 		/**
 		 * Left subtree of this node.
-		 * ¨Buildings which are on the left in the relief of building in thi node.
+		 * Buildings which are on the left in the relief of the building in this node.
 		 */
 		Node* leftSubTree = nullptr;
 		/**
 		 * Right subtree of this node.
-		 * Buildings which are on the right in the relief of building in thi node.
+		 * Buildings which are on the right in the relief of the building in this node.
 		 */
 		Node* rightSubTree = nullptr;
-		
-		Node(Building _building):building(_building){};
+
+		Node(Building _building) :building(_building) {};
 		~Node();
-		
+
 	};
 
 	/**
-	 * Variable indikates wheather the relief was already created.
-	 * If was, only method getRelief do something, other methods do nothing and returning false.
+	 * Variable indicates whether the relief was already created.
+	 * If the relief is created, only method getRelief does something, other methods do nothing and returning false.
 	 */
 	bool editable = true;
 	/**
@@ -92,59 +92,58 @@ private:
 	 */
 	std::priority_queue<Building> heapBuilding;
 	/**
-	 * Represents relief, in format that was given in the assignment
+	 * Represents relief, in format that was given in the assignment.
 	 */
 	std::vector<int> relief;
 
 	/**
-	 * Add new building, it's part or nothing to the tree(subtree) of buildings, with the rote node. 
-	 * It is added just the part of building, which extends the relief.
-	 * 
-	 * \param node root of subtree, in which we want insert the building
-	 * \param building the building we want to insert
+	 * Adds new building, it's part or nothing to the tree(subtree) of buildings, with the root node.
+	 * Only building or part of building, which extends the relief, is added.
+	 *
+	 * \param node root of subtree, the building is being inserted into
+	 * \param building the building to insert
 	 */
 	void insertToTree(Node*& node, const Building& building);
 
 	/**
-	 * Convert relief in tree format to relief in format that was given in the assignment
-	 * 
-	 * \param root is root of the tree, that represents relief
+	 * Converts relief in the tree format to relief in the format that was given in the assignment
+	 *
+	 * \param root is root of the tree, that represents the relief
 	 */
 	void treeToVector(Node* root);
 	/**
-	 * Rekursive method called in void treeToVector(Node* root).
-	 * Last end is using for adding sector with zero height to the relief in vector form.
-	 * 
+	 * Recursive method called from void treeToVector(Node* root).
+	 * Last end is used for adding section with zero height to the relief in the vector form.
+	 *
 	 * \param root is root of given subtree
-	 * \param lastEnd represents X cordinates of end of the last already processed building
-	 * \return X cordinates of end of the last, in this method call processed, building
+	 * \param lastEnd represents X coordinate of the end of the last already processed building
+	 * \return X coordinate of the end of the last building processed by this method
 	 */
 	int treeToVector(Node* root, int lastEnd);
 
 public:
 	/**
-	 * Add new building to the vector of Buildings, from which relief is created.
+	 * Adds new building to the vector of Buildings, from which relief is created.
 	 *
-	 * \param begin is X cordinate of begin of the building
-	 * \param end is X cordinate of end of the building
+	 * \param begin is X coordinate of the beginning of the building
+	 * \param end is X coordinate of the end of the building
 	 * \param height representing height of the building
 	 */
 	bool addBuilding(int begin, int height, int end);
 
 	/**
-	 * Create relif out of all buildings which ewre added to the ReliefMaker.
-	 * It could be called just onec.
-	 * After the call, no buildigs could be added.
-	 * 
-	 * \return true if it's call for the first time and create the relief, false if the relief is already created 
+	 * Creates relief out of all buildings which were added to the ReliefCreoator.
+	 * It could be called just once.
+	 * After this method call new buildings cannot be added.
+	 *
+	 * \return true if it is called the first time, false if the relief is already created
 	 */
 	bool createRelief();
 
 	/**
-	 * Return relief in the format that was given in the assignment.
-	 * 
-	 * \return relief, if createRelief was called before, empty vector if createRelief was not called or there were not added buildings.
+	 * Returns the relief in the format that was given in the assignment.
+	 *
+	 * \return relief, if createRelief was called before or empty vector if createRelief was not called or no building were added.
 	 */
 	const std::vector<int>& getRelief() const;
 };
-

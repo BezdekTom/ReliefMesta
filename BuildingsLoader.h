@@ -6,12 +6,11 @@ class BuildingsLoader
 {
 public:
 	/**
-	 * Method load data about buildings and add these building to reliefCreater
-	 * 
-	 * \param reliefCreater is the reliefCreater in which are the data added
-	 * \param inputFileName name of file with data about building, in form:  <int begin> <int height> <int end> \n 
-	 * \return false if its imposible to add the building to reliefCreater, otherwise it return true
+	 * Loads data of buildings and adds these buildings to reliefCreator
+	 *
+	 * \param reliefCreator is the ReliefCreator to add data
+	 * \param inputFileName name of the file with data of buildings, in form:  <int begin> <int height> <int end> \n
+	 * \return false if it is impossible to add a building to reliefCreator, otherwise it return true
 	 */
-	static bool loadBuildingsFromFile(ReliefCreator& reliefCreater, const std::string& inputFileName);
+	static bool loadBuildingsFromFile(ReliefCreator& reliefCreator, const std::string& inputFileName);
 };
-
